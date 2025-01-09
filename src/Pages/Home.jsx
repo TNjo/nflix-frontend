@@ -106,12 +106,6 @@ const Home = () => {
       {/* Header Section */}
       <Header/>
 
-      {/* Top Movies Section */}
-      {/* Loading Overlay */}
-      {/* {isLoading && (
-        <div className="absolute top-0 left-0 w-full h-full bg-black opacity-50 z-10"></div>
-      )} */}
-
       {/* Loading Spinner */}
       {isLoading ? (
         <div className="flex justify-center items-center h-screen z-20">
