@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import '../App.css';
+import Header from "./Header";
 
 const Home = () => {
   const [topMovies, setTopMovies] = useState([]);
@@ -8,57 +10,42 @@ const Home = () => {
   const [topMoviesIndex, setTopMoviesIndex] = useState(0);
   const [recentMoviesIndex, setRecentMoviesIndex] = useState(0);
   const [newlyAddedMoviesIndex, setNewlyAddedMoviesIndex] = useState(0); // Index for Newly Added Movies
+  const [isLoading, setIsLoading] = useState(true); // Loading state
   const navigate = useNavigate();
 
-  // Fetch Top Movies
+  // Fetch Movies
   useEffect(() => {
-    const fetchTopMovies = async () => {
+    const fetchMovies = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/imdb/top-movies");
-        const data = await response.json();
-        setTopMovies(data.slice(0, 30)); // Get top 30 movies
+        const [topRes, recentRes, newlyAddedRes] = await Promise.all([
+          fetch("http://127.0.0.1:5000/imdb/top-movies"),
+          fetch("http://127.0.0.1:5000/newly-added-image"),
+          fetch("http://127.0.0.1:5000/newly-added-movies"),
+        ]);
+
+        const [topData, recentData, newlyAddedData] = await Promise.all([
+          topRes.json(),
+          recentRes.json(),
+          newlyAddedRes.json(),
+        ]);
+
+        setTopMovies(topData.slice(0, 30));
+        setRecentMovies(recentData);
+        setNewlyAddedMovies(newlyAddedData);
       } catch (error) {
-        console.error("Error fetching top movies:", error);
+        console.error("Error fetching movies:", error);
+      } finally {
+        setIsLoading(false); // Set loading to false once data is fetched
       }
     };
 
-    fetchTopMovies();
-  }, []);
-
-  // Fetch Recently Added Movies
-  useEffect(() => {
-    const fetchRecentMovies = async () => {
-      try {
-        const response = await fetch("http://127.0.0.1:5000/newly-added-image");
-        const data = await response.json();
-        setRecentMovies(data);
-      } catch (error) {
-        console.error("Error fetching recently added movies:", error);
-      }
-    };
-
-    fetchRecentMovies();
-  }, []);
-
-  // Fetch Newly Added Movies
-  useEffect(() => {
-    const fetchNewlyAddedMovies = async () => {
-      try {
-        const response = await fetch("http://127.0.0.1:5000/newly-added-movies"); // Newly Added Movies API
-        const data = await response.json();
-        setNewlyAddedMovies(data);
-      } catch (error) {
-        console.error("Error fetching newly added movies:", error);
-      }
-    };
-
-    fetchNewlyAddedMovies();
+    fetchMovies();
   }, []);
 
   const goToPreviousTopMovies = () => {
     setTopMoviesIndex((prevIndex) => {
       if (prevIndex === 0) {
-        return Math.floor(topMovies.length / 5) - 1;
+        return Math.floor(window.innerWidth / 320) - 1;
       }
       return prevIndex - 1;
     });
@@ -114,186 +101,227 @@ const Home = () => {
   };
 
   return (
-    <div className="bg-gray-900 min-h-screen text-white">
+    <div className="bg-gray-900 min-h-screen text-white relative pb-8">
+
       {/* Header Section */}
-      <header className="p-6 bg-gray-800 text-center text-6xl font-bold text-red-700">
-      <button
-          className="text-white text-xl font-bold text-left mr-20"
-          onClick={() => navigate("/search-movie")} // Navigate to home when clicked
-        >
-          Search
-        </button>
-        NFLIX
-        <button
-          className="text-white text-xl font-bold text-left ml-20"
-          onClick={() => navigate("/my-movies")} // Navigate to home when clicked
-        >
-          Saved List
-        </button>
-      </header>
+      <Header/>
 
       {/* Top Movies Section */}
-      <section className="container mx-auto p-4">
-        <h2 className="text-2xl font-bold mb-4">Top Movies</h2>
-        <div className="relative">
-          <div className="flex overflow-hidden">
-            <div
-              className="flex transition-transform duration-500"
-              style={{
-                transform: `translateX(-${(topMoviesIndex * 100) / 5}%)`,
-              }}
-            >
-              {topMovies.map((movie, index) => (
-                <div
-                  key={index}
-                  className="w-64 flex-shrink-0 bg-gray-800 rounded-lg overflow-hidden shadow-lg mx-6"
-                >
-                  <img
-                    src={movie.image}
-                    alt={movie.name}
-                    className="w-full h-80 object-cover"
-                  />
-                  <div className="p-1">
-                    <h3 className="text-lg font-bold mb-2">{movie.name}</h3>
-                    <button
-                      onClick={() => goToMovieDetails(movie.imdb)} // On button click, navigate to details page
-                      className="bg-red-600 text-white py-2 px-4 rounded mt-2 align-middle"
-                    >
-                      View Details
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* Loading Overlay */}
+      {/* {isLoading && (
+        <div className="absolute top-0 left-0 w-full h-full bg-black opacity-50 z-10"></div>
+      )} */}
 
-          {/* Navigation Buttons */}
-          <button
-            onClick={goToPreviousTopMovies}
-            className="absolute top-1/2 left-0 transform -translate-y-1/2 text-white bg-black bg-opacity-50 px-4 py-2 rounded-full"
-          >
-            &lt;
-          </button>
-          <button
-            onClick={goToNextTopMovies}
-            className="absolute top-1/2 right-0 transform -translate-y-1/2 text-white bg-black bg-opacity-50 px-4 py-2 rounded-full"
-          >
-            &gt;
-          </button>
+      {/* Loading Spinner */}
+      {isLoading ? (
+        <div className="flex justify-center items-center h-screen z-20">
+          <div className="progress-circle"></div>
         </div>
-      </section>
+      ) : (
+        <>
+          <section className="container mx-auto px-4 pt-24">
+            <h2 className="text-2xl font-bold px-4 pt-8 pb-8">Top Movies</h2>
+            <div className="relative flex items-center">
 
-      {/* Recently Added Movies Section */}
-      <section className="container mx-auto p-4">
-        <h2 className="text-2xl font-bold mb-4">Recently Added</h2>
-        <div className="relative">
-          {/* Carousel Wrapper */}
-          <div className="flex overflow-hidden">
-            <div
-              className="flex transition-transform duration-500"
-              style={{
-                transform: `translateX(-${(recentMoviesIndex * 100) / 5}%)`,
-              }}
-            >
-              {recentMovies.map((movie, index) => (
-                <div
-                  key={index}
-                  className="w-64 flex-shrink-0 bg-gray-800 rounded-lg overflow-hidden shadow-lg mx-6" // Same style as top movies
+              {/* Fixed Area for Previous Button */}
+              <div className="flex-shrink-0 w-12 sm:w-16 lg:w-20 flex justify-center">
+                <button
+                  onClick={goToPreviousTopMovies}
+                  className="text-white bg-white bg-opacity-30 px-3 sm:px-4 py-2 rounded-full"
                 >
-                  {movie.image ? (
-                    <img
-                      src={movie.image}
-                      alt={movie.name}
-                      className="w-full h-80 object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-80 bg-gray-700 flex justify-center items-center">
-                      <span className="text-white text-xl">No Image Available</span>
+                  &lt;
+                </button>
+              </div>
+
+              {/* Carousel Wrapper */}
+              <div className="flex overflow-hidden flex-grow">
+                <div
+                  className="flex transition-transform duration-500"
+                  style={{
+                    transform: `translateX(-${(topMoviesIndex * 100) / 5}%)`,
+                  }}
+                >
+                  {topMovies.map((movie, index) => (
+                    <div
+                      key={index}
+                      className="w-64 flex-shrink-0 bg-gray-800 rounded-lg overflow-hidden shadow-lg mx-6"
+                    >
+                      {movie.image ? (
+                        <img
+                          src={movie.image}
+                          alt={movie.name}
+                          className="w-full h-80 object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-80 bg-gray-700 flex justify-center items-center">
+                          <span className="text-white text-xl">No Image Available</span>
+                        </div>
+                      )}
+                      <div className="p-4">
+                        <h3 className="text-lg font-bold mb-2 break-words max-w-xs">{movie.name}</h3>
+                        {/* {movie.details && (
+                          <p className="text-sm">{movie.details}</p>
+                        )} */}
+                        <button
+                          onClick={() => goToMovieDetails(movie.imdb)}
+                          className="bg-red-600 text-white py-2 px-4 rounded mt-2 align-middle"
+                        >
+                          View Details
+                        </button>
+                      </div>
                     </div>
-                  )}
-                  <div className="p-4">
-                    <h3 className="text-lg font-bold mb-2">{movie.name}</h3>
-                    {movie.details && (
-                      <p className="text-sm">{movie.details}</p>
-                    )}
-                    <button
-                      onClick={() => goToMovieDetails(movie.imdb)} // On button click, navigate to details page
-                      className="bg-red-600 text-white py-2 px-4 rounded mt-2 align-middle"
-                    >
-                      View Details
-                    </button>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* Navigation Buttons for Recently Added */}
-          <button
-            onClick={goToPreviousRecentMovies}
-            className="absolute top-1/2 left-0 transform -translate-y-1/2 text-white bg-black bg-opacity-50 px-4 py-2 rounded-full"
-          >
-            &lt;
-          </button>
-          <button
-            onClick={goToNextRecentMovies}
-            className="absolute top-1/2 right-0 transform -translate-y-1/2 text-white bg-black bg-opacity-50 px-4 py-2 rounded-full"
-          >
-            &gt;
-          </button>
-        </div>
-      </section>
-
-      {/* Newly Added Movies Section */}
-      <section className="container mx-auto p-4">
-        <h2 className="text-2xl font-bold mb-4">Newly Added Movies</h2>
-        <div className="relative">
-          <div className="flex overflow-hidden">
-            <div
-              className="flex transition-transform duration-500"
-              style={{
-                transform: `translateX(-${(newlyAddedMoviesIndex * 100) / 5}%)`,
-              }}
-            >
-              {newlyAddedMovies.map((movie, index) => (
-                <div
-                  key={index}
-                  className="w-64 flex-shrink-0 bg-gray-800 rounded-lg overflow-hidden shadow-lg mx-6"
+              {/* Fixed Area for Next Button */}
+              <div className="flex-shrink-0 w-12 sm:w-16 lg:w-20 flex justify-center">
+                <button
+                  onClick={goToNextTopMovies}
+                  className="text-white bg-white bg-opacity-30 px-3 sm:px-4 py-2 rounded-full"
                 >
-                  <img
-                    src={movie.image}
-                    alt={movie.name}
-                    className="w-full h-80 object-cover"
-                  />
-                  <div className="p-1">
-                    <h3 className="text-lg font-bold mb-2">{movie.name}</h3>
-                    <button
-                      onClick={() => goToMovieDetails(movie.imdb)} // On button click, navigate to details page
-                      className="bg-red-600 text-white py-2 px-4 rounded mt-2 align-middle"
-                    >
-                      View Details
-                    </button>
-                  </div>
-                </div>
-              ))}
+                  &gt;
+                </button>
+              </div>
             </div>
-          </div>
+          </section>
 
-          {/* Navigation Buttons for Newly Added Movies */}
-          <button
-            onClick={goToPreviousNewlyAddedMovies}
-            className="absolute top-1/2 left-0 transform -translate-y-1/2 text-white bg-black bg-opacity-50 px-4 py-2 rounded-full"
-          >
-            &lt;
-          </button>
-          <button
-            onClick={goToNextNewlyAddedMovies}
-            className="absolute top-1/2 right-0 transform -translate-y-1/2 text-white bg-black bg-opacity-50 px-4 py-2 rounded-full"
-          >
-            &gt;
-          </button>
-        </div>
-      </section>
+
+          {/* Recently Added Movies Section */}
+          <section className="container mx-auto px-4">
+            <h2 className="text-2xl font-bold px-4 pt-8 pb-8">Recently Added</h2>
+            <div className="relative flex items-center">
+              {/* Fixed Area for Previous Button */}
+              <div className="flex-shrink-0 w-12 sm:w-16 lg:w-20 flex justify-center">
+                <button
+                  onClick={goToPreviousRecentMovies}
+                  className="text-white bg-white bg-opacity-30 px-3 sm:px-4 py-2 rounded-full"
+                >
+                  &lt;
+                </button>
+              </div>
+
+              {/* Carousel Wrapper */}
+              <div className="flex overflow-hidden flex-grow">
+                <div
+                  className="flex transition-transform duration-500"
+                  style={{
+                    transform: `translateX(-${(recentMoviesIndex * 100) / 5}%)`,
+                  }}
+                >
+                  {recentMovies.map((movie, index) => (
+                    <div
+                      key={index}
+                      className="w-64 flex-shrink-0 bg-gray-800 rounded-lg overflow-hidden shadow-lg mx-6"
+                    >
+                      {movie.image ? (
+                        <img
+                          src={movie.image}
+                          alt={movie.name}
+                          className="w-full h-80 object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-80 bg-gray-700 flex justify-center items-center">
+                          <span className="text-white text-xl">No Image Available</span>
+                        </div>
+                      )}
+                      <div className="p-4">
+                        <h3 className="text-lg font-bold mb-2 break-words max-w-xs">{movie.name}</h3>
+                        {/* {movie.details && (
+                          <p className="text-sm">{movie.details}</p>
+                        )} */}
+                        <button
+                          onClick={() => goToMovieDetails(movie.imdb)} // On button click, navigate to details page
+                          className="bg-red-600 text-white py-2 px-4 rounded mt-2 align-middle"
+                        >
+                          View Details
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fixed Area for Next Button */}
+              <div className="flex-shrink-0 w-12 sm:w-16 lg:w-20 flex justify-center">
+                <button
+                  onClick={goToNextRecentMovies}
+                  className="text-white bg-white bg-opacity-30 px-3 sm:px-4 py-2 rounded-full"
+                >
+                  &gt;
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {/* Newly Added Movies Section */}
+          <section className="container mx-auto px-4">
+            <h2 className="text-2xl font-bold px-4 pt-8 pb-8">Newly Added Movies</h2>
+            <div className="relative flex items-center">
+              {/* Fixed Area for Previous Button */}
+              <div className="flex-shrink-0 w-12 sm:w-16 lg:w-20 flex justify-center">
+                <button
+                  onClick={goToPreviousNewlyAddedMovies}
+                  className="text-white bg-white bg-opacity-30 px-3 sm:px-4 py-2 rounded-full"
+                >
+                  &lt;
+                </button>
+              </div>
+
+              {/* Carousel Wrapper */}
+              <div className="flex overflow-hidden flex-grow">
+                <div
+                  className="flex transition-transform duration-500"
+                  style={{
+                    transform: `translateX(-${(newlyAddedMoviesIndex * 100) / 5}%)`,
+                  }}
+                >
+                  {newlyAddedMovies.map((movie, index) => (
+                    <div
+                      key={index}
+                      className="w-64 flex-shrink-0 bg-gray-800 rounded-lg overflow-hidden shadow-lg mx-6"
+                    >
+                      {movie.image ? (
+                        <img
+                          src={movie.image}
+                          alt={movie.name}
+                          className="w-full h-80 object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-80 bg-gray-700 flex justify-center items-center">
+                          <span className="text-white text-xl">No Image Available</span>
+                        </div>
+                      )}
+                      <div className="p-4">
+                        <h3 className="text-lg font-bold mb-2 break-words max-w-xs">{movie.name}</h3>
+                        {/* {movie.details && (
+                          <p className="text-sm">{movie.details}</p>
+                        )} */}
+                        <button
+                          onClick={() => goToMovieDetails(movie.imdb)} // On button click, navigate to details page
+                          className="bg-red-600 text-white py-2 px-4 rounded mt-2 align-middle"
+                        >
+                          View Details
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fixed Area for Next Button */}
+              <div className="flex-shrink-0 w-12 sm:w-16 lg:w-20 flex justify-center">
+                <button
+                  onClick={goToNextNewlyAddedMovies}
+                  className="text-white bg-white bg-opacity-30 px-3 sm:px-4 py-2 rounded-full"
+                >
+                  &gt;
+                </button>
+              </div>
+            </div>
+          </section>
+        </>
+      )}
     </div>
   );
 };
