@@ -65,6 +65,12 @@ const FileList = () => {
                   <span className="text-gray-400">{file.size}</span> {/* File size */}
                 </div>
                 <button
+                  className="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-200"
+                  onClick={""}
+                >
+                  Open
+                </button>
+                <button
                   className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
                   onClick={() => handleDelete(file.name)}
                 >
