@@ -53,8 +53,7 @@ const FileList = () => {
   return (
     <div className="bg-gray-900 min-h-screen text-white">
       <Header/>
-
-      <section className="container mx-auto p-4">
+      <section className="container mx-auto px-4 pt-24">
         {error ? (
           <p className="text-red-500 text-center">{error}</p>
         ) : (
