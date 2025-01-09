@@ -158,7 +158,6 @@ const MovieDetails = () => {
   const [movieDetails, setMovieDetails] = useState(null);
   const [trailerUrl, setTrailerUrl] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(""); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -183,19 +182,7 @@ const MovieDetails = () => {
     fetchMovieDetails();
   }, [imdbNumber]);
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value); // Capture search input
-  };
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault(); // Prevent default form submission
-    if (searchQuery.trim()) {
-      navigate(`/search-movie?query=${searchQuery}`); // Pass the search query as a URL parameter
-    }
-  };
-
   const renderField = (value) => (value ? value : "Not mentioned");
-
 
   return (
     <div className="bg-gray-900 min-h-screen text-white">
@@ -252,6 +239,7 @@ const MovieDetails = () => {
             {/* Play Button */}
             <button
               className="flex items-center bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-gray-200 transition"
+              onClick={""}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -267,6 +255,7 @@ const MovieDetails = () => {
             {/* Download Button */}
             <button
               className="flex items-center bg-gray-700 text-white px-5 py-2 rounded-lg font-semibold hover:bg-gray-600 transition"
+              onClick={""}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
