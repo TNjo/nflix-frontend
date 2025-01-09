@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
+import Header from './Header';
 
 const FileList = () => {
   const [files, setFiles] = useState([]);
@@ -51,21 +52,7 @@ const FileList = () => {
 
   return (
     <div className="bg-gray-900 min-h-screen text-white">
-      <header className="p-6 bg-gray-800 text-center text-6xl font-bold text-red-700">
-      <button
-          className="text-white text-xl font-bold text-left mr-20"
-          onClick={() => navigate("/")} // Navigate to home when clicked
-        >
-          Home
-        </button>
-        Available Files
-        <button
-          className="text-white text-xl font-bold text-left ml-20"
-          onClick={() => navigate("/search-movie")} // Navigate to home when clicked
-        >
-            Search
-        </button>
-      </header>
+      <Header/>
 
       <section className="container mx-auto p-4">
         {error ? (
