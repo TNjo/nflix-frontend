@@ -1,27 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { FaSearch } from "react-icons/fa";
 
 const SearchMoviePage = () => {
-  const [searchTerm, setSearchTerm] = useState(''); // State for search input
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const query = queryParams.get("query"); // Retrieve the search query
+  const [searchTerm, setSearchTerm] = useState(query); // State for search input
   const [movies, setMovies] = useState([]); // State for API response
   const [error, setError] = useState(null); // State for handling errors
   const navigate = useNavigate();
 
-  // Function to fetch movies when the search button is clicked
-  const handleSearch = async () => {
-    if (!searchTerm) return; // Prevent empty search
+  // Run fetchMovies when the query in the URL changes
+  useEffect(() => {
+    setSearchTerm(query); // Update the search term in the input field
+    fetchMovies(query); // Fetch movies based on the query
+  }, [query]);
+
+  // Fetch movies based on the search query
+  const fetchMovies = async (searchValue) => {
+    if (!searchValue) {
+      setMovies([]);
+      return;
+    }
 
     try {
-      const response = await axios.get(`http://127.0.0.1:5000/search-movie/${searchTerm}`);
+      const response = await axios.get(`http://127.0.0.1:5000/search-movie/${searchValue}`);
       setMovies(response.data); // Set movies data
       setError(null);
-      setSearchTerm(''); // Clear the search field after search
     } catch (err) {
-      setError('Failed to fetch movies. Please try again.');
+      setError("Failed to fetch movies. Please try again.");
       setMovies([]); // Clear movies on error
-      setSearchTerm(''); // Clear the search field on error
     }
+  };
+
+  // Handle search when the button is clicked
+  const handleSearch = () => {
+    navigate(`/search-movie?query=${encodeURIComponent(searchTerm.trim())}`); // Update the URL
   };
 
   // Helper function to format size (MB or GB)
@@ -32,7 +48,7 @@ const SearchMoviePage = () => {
       : `${(size / (1024 * 1024)).toFixed(2)} MB`;
   };
 
-  const streamMovie = async(info_hash, name) => {
+  const streamMovie = async (info_hash, name) => {
     const response = await axios.get(`http://127.0.0.1:5000/generate-magnet/${info_hash}/${name}`);
     alert(response.data.message);
   };
@@ -42,43 +58,48 @@ const SearchMoviePage = () => {
   };
 
   return (
-    <div className="bg-gray-900 min-h-screen text-white">
-      <header className="p-6 bg-gray-800 text-center text-6xl font-bold text-red-700">
-      <button
-          className="text-white text-xl font-bold text-left mr-20"
-          onClick={() => navigate("/")} // Navigate to home when clicked
-        >
-          Home
-        </button>
-        Search Movies
-        <button
-          className="text-white text-xl font-bold text-left ml-20"
-          onClick={() => navigate("/my-movies")} // Navigate to home when clicked
-        >
-            Saved List
-        </button>
-      </header>
-
-      <section className="container mx-auto p-4">
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-6">
-          <div className="flex justify-center mb-4">
-            <input
-              type="text"
-              placeholder="Enter movie name"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-4 py-2 w-1/3 text-lg rounded-lg border border-gray-600 text-black"
-            />
-            <button
-              onClick={handleSearch}
-              className="ml-4 px-6 py-2 bg-blue-500 text-white rounded-lg text-lg hover:bg-blue-600"
-            >
-              Search
-            </button>
+    <div className="bg-gray-900 min-h-screen text-white relative pb-8">
+      <header className="fixed top-0 left-0 right-0 bg-gray-800 text-white flex items-center justify-between p-6 z-10">
+        {/* NFLIX Icon */}
+        <div className="min-w-0 flex-1">
+          <div
+            className="text-4xl font-bold text-red-700 mr-6 cursor-pointer"
+            onClick={() => navigate("/")} // Navigate to the home page
+          >
+            NFLIX
           </div>
-          {error && <p className="text-red-500 text-center">{error}</p>}
         </div>
 
+        {/* Search Bar */}
+        <div className="relative flex lg:ml-4 lg:mt-0 mx-2 w-[50%] lg:w-[600px]">
+          <input
+            type="text"
+            placeholder="Search for movies..."
+            className="w-full p-2 rounded-lg text-black pr-10"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)} // Update search text
+            onKeyPress={(e) => {
+              if (e.key === "Enter") handleSearch(); // Perform search on Enter key press
+            }}
+          />
+          <FaSearch
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+            onClick={handleSearch} // Perform search on clicking the icon
+          />
+        </div>
+
+        {/* Saved List Button */}
+        <div className="flex items-center ml-3">
+          <button
+            className="text-l font-bold bg-red-600 text-white py-2 px-4 rounded-lg "
+            onClick={() => navigate("/my-movies")}
+          >
+            Saved List
+          </button>
+        </div>
+      </header>
+
+      <section className="container mx-auto px-4 pt-24">
         {/* Movie List */}
         {movies.length > 0 ? (
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
