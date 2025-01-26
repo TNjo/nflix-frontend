@@ -16,7 +16,7 @@ const Header = () => {
             {/* NFLIX Icon */}
             <div className="min-w-0 flex-1">
                 <div
-                    className="text-4xl font-bold text-red-700 mr-6 cursor-pointer"
+                    className="text-4xl font-bold text-red-700 hover:text-red-600 mr-6 cursor-pointer"
                     onClick={() => navigate("/")} // Navigate to the home page
                 >
                     NFLIX
@@ -44,7 +44,7 @@ const Header = () => {
             {/* Saved List Button */}
             <div className="flex items-center ml-2">
                 <button
-                    className="text-l font-bold bg-red-600 text-white py-2 px-4 rounded-lg "
+                    className="text-l font-bold bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg "
                     onClick={() => navigate("/my-movies")}
                 >
                     Saved List
