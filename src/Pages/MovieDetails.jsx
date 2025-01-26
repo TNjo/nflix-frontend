@@ -151,7 +151,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Header from "./Header";
+import Header from "../components/Header";
 
 const MovieDetails = () => {
   const { imdbNumber } = useParams();

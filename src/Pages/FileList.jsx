@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import Header from './Header';
+import Header from '../components/Header';
 
 const FileList = () => {
   const [files, setFiles] = useState([]);
