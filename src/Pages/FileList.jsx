@@ -52,30 +52,38 @@ const FileList = () => {
 
   return (
     <div className="bg-gray-900 min-h-screen text-white">
-      <Header/>
-      <section className="container mx-auto px-4 pt-24">
+      <Header />
+      <section className="container mx-auto px-12 pt-24">
+        <h2 className="text-3xl font-bold px-2 pt-8 pb-8">Downloads and Saved List</h2>
         {error ? (
           <p className="text-red-500 text-center">{error}</p>
         ) : (
-          <ul className="space-y-4">
+          <ul className="space-y-6 px-8">
             {files.map((file, index) => (
-              <li key={index} className="bg-gray-800 p-4 rounded-lg shadow-lg flex justify-between items-center">
-                <div className="text-sm">
-                  <strong className="block text-xl">{file.name}</strong> {/* File name */}
-                  <span className="text-gray-400">{file.size}</span> {/* File size */}
+              <li
+                key={index}
+                className="bg-gray-800 p-6 rounded-lg shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-transform hover:scale-105"
+              >
+                <div className="flex-1">
+                  <h2 className="text-lg font-semibold mb-1 text-gray-100 truncate">
+                    {file.name}
+                  </h2>
+                  <p className="text-sm text-gray-400">{file.size ? file.size : 'Unknown size'}</p>
                 </div>
-                <button
-                  className="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-200"
-                  onClick={""}
-                >
-                  Open
-                </button>
-                <button
-                  className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                  onClick={() => handleDelete(file.name)}
-                >
-                  Delete
-                </button>
+                <div className="flex gap-4">
+                  <button
+                    className="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-white hover:text-black  transition-colors"
+                    onClick={""}
+                  >
+                    Open
+                  </button>
+                  <button
+                    className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                    onClick={() => handleDelete(file.name)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </li>
             ))}
           </ul>

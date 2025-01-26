@@ -12,7 +12,7 @@ const Carousel = ({
 }) => {
   return (
     <section className="container mx-auto px-4">
-      <h2 className="text-2xl font-bold px-4 pt-8 pb-8">{title}</h2>
+      <h2 className="text-3xl font-bold px-4 pt-8 pb-8">{title}</h2>
       <div className="relative flex items-center">
         {/* Fixed Area for Previous Button */}
         <div className="flex-shrink-0 w-12 sm:w-16 lg:w-20 flex justify-center">
