@@ -102,10 +102,10 @@ const SearchMoviePage = () => {
       <section className="container mx-auto px-4 pt-24">
         {/* Movie List */}
         {movies.length > 0 ? (
-          <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+          <div className="bg-gray-800 p-6 rounded-lg shadow-lg ">
             <table className="w-full text-lg">
               <thead>
-                <tr className="text-left">
+                <tr className="text-left bg-gray-700 text-gray-300">
                   <th className="px-4 py-2 w-1/4">Name</th> {/* Shortened the movie name column */}
                   <th className="px-4 py-2">Size</th>
                   <th className="px-4 py-2">Seeders</th>
@@ -116,14 +116,14 @@ const SearchMoviePage = () => {
               <tbody>
                 {movies.map((movie, index) => (
                   <tr key={index} className="border-b border-gray-700">
-                    <td className="px-4 py-2 break-words text-sm"> {/* Smaller text size for movie name */}
+                    <td className="px-4 py-4 break-words text-sm"> {/* Smaller text size for movie name */}
                       {/* Display movie name and ensure it wraps in two lines if long */}
                       <p className="line-clamp-2">{movie.name}</p>
                     </td>
-                    <td className="px-4 py-2 text-sm">{formatSize(parseInt(movie.size))}</td> {/* Smaller text size */}
-                    <td className="px-4 py-2 text-sm">{movie.seeders}</td> {/* Smaller text size */}
-                    <td className="px-4 py-2 text-sm">{movie.leechers}</td> {/* Smaller text size */}
-                    <td className="px-4 py-2">
+                    <td className="px-4 py-4 text-sm">{formatSize(parseInt(movie.size))}</td> {/* Smaller text size */}
+                    <td className="px-4 py-4 text-sm">{movie.seeders}</td> {/* Smaller text size */}
+                    <td className="px-4 py-4 text-sm">{movie.leechers}</td> {/* Smaller text size */}
+                    <td className="px-4 py-4">
                       <div className="flex space-x-4">
                         <button
                           className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 w-32 text-sm"
