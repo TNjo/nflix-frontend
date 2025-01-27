@@ -85,7 +85,7 @@ const Home = () => {
       <div className="pt-24" />
 
       <Carousel
-        title="Top Movies"
+        title="IMDB Top Movies"
         movies={topMovies}
         index={topMoviesIndex}
         movieDetails={goToMovieDetails}
@@ -95,7 +95,7 @@ const Home = () => {
       />
 
       <Carousel
-        title="Recently Added"
+        title="Recently Added Tv Series/Tv Shows"
         movies={recentMovies}
         index={recentMoviesIndex}
         movieDetails={goToMovieDetails}

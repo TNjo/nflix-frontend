@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const SearchMoviePage = () => {
   const location = useLocation();
@@ -49,12 +51,27 @@ const SearchMoviePage = () => {
   };
 
   const streamMovie = async (info_hash, name) => {
-    const response = await axios.get(`http://127.0.0.1:5000/generate-magnet/${info_hash}/${name}`);
-    alert(response.data.message);
+    try {
+      const response = await axios.get(`http://127.0.0.1:5000/generate-magnet/${info_hash}/${name}`);
+      toast.success(response.data.message); // Display success message
+    } catch (err) {
+      toast.error("Failed to generate magnet link. Please try again.");
+    }
   };
 
-  const goToMovieDetails = (imdbNumber) => {
-    navigate(`/movie-details/${imdbNumber}`); // Navigate to movie details page using useNavigate
+  const downloadMovie = async (info_hash, name) => {
+    try {
+      const response = await axios.get(`http://127.0.0.1:5000//generate-magnet-download/${info_hash}/${name}`);
+      toast.success(response.data.message); // Display success message
+    } catch (err) {
+      toast.error("Failed to generate magnet link. Please try again.");
+    }
+  };
+
+  const goToMovieDetails = (imdbNumber, infoHash, movieName) => {
+    navigate(`/movie-details/${imdbNumber}`, {
+      state: { infoHash, movieName }, // Pass additional data as state
+    });
   };
 
   return (
@@ -99,10 +116,10 @@ const SearchMoviePage = () => {
         </div>
       </header>
 
-      <section className="container mx-auto px-4 pt-24">
+      <section className="container mx-auto pt-28 w-full">
         {/* Movie List */}
         {movies.length > 0 ? (
-          <div className="bg-gray-800 p-6 rounded-lg shadow-lg ">
+          <div>
             <table className="w-full text-lg">
               <thead>
                 <tr className="text-left bg-gray-700 text-gray-300">
@@ -126,21 +143,38 @@ const SearchMoviePage = () => {
                     <td className="px-4 py-4">
                       <div className="flex space-x-4">
                         <button
-                          className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 w-32 text-sm"
+                          className="flex items-center bg-green-400 text-black px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm"
                           onClick={() => streamMovie(movie.info_hash, movie.name)}
                         >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="currentColor"
+                            viewBox="0 0 16 16"
+                            className="w-5 h-5 mr-1"
+                          >
+                            <path d="M11.596 8.697l-6-4A.5.5 0 0 0 5 5v6a.5.5 0 0 0 .796.404l6-4a.5.5 0 0 0 0-.808z" />
+                          </svg>
                           Watch
                         </button>
                         <button
-                          className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 w-32 text-sm"
-                          onClick={() => alert('Download Movie')}
+                         className="flex items-center bg-yellow-500 text-black px-5 py-2 rounded-lg hover:bg-yellow-600 transition text-sm"
+                         onClick={() => downloadMovie(movie.info_hash, movie.name)}
                         >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                            className="w-5 h-5 mr-2"
+                          >
+                            <path d="M12 16l4-5h-3V4h-2v7H8l4 5z" />
+                            <path d="M20 18v2H4v-2h16z" />
+                          </svg>
                           Download
                         </button>
                         {movie.imdb && (
                           <button
-                            className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 w-32 text-sm"
-                            onClick={() => goToMovieDetails(movie.imdb)}
+                            className="px-6 py-2 bg-orange-500 text-black rounded-lg hover:bg-orange-600 w-32 text-sm"
+                            onClick={() => goToMovieDetails(movie.imdb, movie.info_hash, movie.name)}
                           >
                             View Details
                           </button>
@@ -156,7 +190,9 @@ const SearchMoviePage = () => {
           <p className="text-center text-gray-500 mt-4">No movies found. Try searching for a title.</p>
         )}
       </section>
+      <ToastContainer />
     </div>
+
   );
 };
 
