@@ -68,7 +68,7 @@ const MovieDetails = () => {
           <img
             src={movieDetails?.image || "/path/to/default-image.jpg"}
             alt={movieDetails?.name}
-            className="rounded-lg shadow-lg object-cover w-full h-[600px]"
+            className="rounded-lg shadow-lg object-cover w-full h-full"
           />
         </div>
 
