@@ -13,6 +13,8 @@ function createWindow() {
             nodeIntegration: false,  // Disable Node.js integration (for security reasons)
             contextIsolation: true,  // Enable context isolation
             // preload: path.join(__dirname, 'preload.js')  // Optional: preload script if needed
+            enableRemoteModule: true, // Ensure remote module is enabled
+            nativeWindowOpen: true, // ✅ Fixes modal issues
         },
     });
 
