@@ -143,7 +143,7 @@ const SearchMoviePage = () => {
                     <td className="px-4 py-4">
                       <div className="flex space-x-4">
                         <button
-                          className="flex items-center bg-green-400 text-black px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm"
+                          className="flex items-center bg-[#8bc1e0] text-black px-4 py-2 rounded-lg hover:bg-[#6fb1d6] transition text-sm"
                           onClick={() => streamMovie(movie.info_hash, movie.name)}
                         >
                           <svg
@@ -157,7 +157,7 @@ const SearchMoviePage = () => {
                           Watch
                         </button>
                         <button
-                         className="flex items-center bg-yellow-500 text-black px-5 py-2 rounded-lg hover:bg-yellow-600 transition text-sm"
+                         className="flex items-center bg-[#7d98d4] text-black px-5 py-2 rounded-lg hover:bg-[#6783cf] transition text-sm"
                          onClick={() => downloadMovie(movie.info_hash, movie.name)}
                         >
                           <svg
@@ -173,7 +173,7 @@ const SearchMoviePage = () => {
                         </button>
                         {movie.imdb && (
                           <button
-                            className="px-6 py-2 bg-orange-500 text-black rounded-lg hover:bg-orange-600 w-32 text-sm"
+                            className="px-6 py-2 bg-[#937DC2] text-black rounded-lg hover:bg-[#8967B3] w-32 text-sm"
                             onClick={() => goToMovieDetails(movie.imdb, movie.info_hash, movie.name)}
                           >
                             View Details

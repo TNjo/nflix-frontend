@@ -71,6 +71,8 @@ const FileList = () => {
         <h2 className="text-3xl font-bold px-2 pt-8 pb-8">Downloads and Saved List</h2>
         {error ? (
           <p className="text-red-500 text-center">{error}</p>
+        ) : files.length > 0 ? (
+          <p className="text-center text-gray-500 mt-4">No movies found. Start downloading now!</p>
         ) : (
           <ul className="space-y-6 px-8">
             {files.map((file, index) => (

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/Header";
+import LoadingOverlay from "../components/LoadingOverlay";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
@@ -12,6 +13,7 @@ const MovieDetails = () => {
   const [movieDetails, setMovieDetails] = useState(null);
   const [trailerUrl, setTrailerUrl] = useState(null);
   const [isTrailerOpen, setIsTrailerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,12 +24,14 @@ const MovieDetails = () => {
         );
         const data = await response.json();
         setMovieDetails(data);
-
+        setIsLoading(false);
+        
         const trailerResponse = await fetch(
           `http://127.0.0.1:5000/Get-Trailer-By-ID/${imdbNumber}`
         );
         const trailerData = await trailerResponse.json();
         setTrailerUrl(trailerData.trailer_url);
+
       } catch (error) {
         console.error("Error fetching movie details:", error);
       }
@@ -60,17 +64,19 @@ const MovieDetails = () => {
     <div className="bg-gray-900 min-h-screen text-white">
       {/* Header */}
       <Header />
+      {isLoading && <LoadingOverlay />}
 
       {/* Content Section */}
-      <section className="container mx-auto p-6 flex flex-col md:flex-row items-start pt-28">
+      <section className="container mx-auto px-16 flex flex-col md:flex-row items-start pt-28">
         {/* Left Section: Movie Poster */}
-        <div className="w-full md:w-1/3 mr-8 ml-16">
+        <div className="w-80 h-[24rem] md:w-[25rem] md:h-[37rem] mr-8 overflow-hidden rounded-lg shadow-lg bg-gray-800 flex justify-center items-center">
           <img
             src={movieDetails?.image || "/path/to/default-image.jpg"}
             alt={movieDetails?.name}
-            className="rounded-lg shadow-lg object-cover w-full h-full"
+            className="w-full h-full object-cover rounded-lg"
           />
         </div>
+
 
         {/* Right Section: Movie Details */}
         <div className="w-full md:w-2/3">
@@ -206,39 +212,39 @@ const MovieDetails = () => {
               </span>
             </div>
             {trailerUrl && (
-            <button
-              onClick={() => setIsTrailerOpen(true)}
-              className="bg-red-600 text-white px-4 py-2 mt-2 rounded-lg text-md font-semibold hover:bg-red-700 transition"
-            >
-              Watch Trailer
-            </button>
-          )}
+              <button
+                onClick={() => setIsTrailerOpen(true)}
+                className="bg-red-600 text-white px-4 py-2 mt-2 rounded-lg text-md font-semibold hover:bg-red-700 transition"
+              >
+                Watch Trailer
+              </button>
+            )}
           </div>
         </div>
       </section>
 
-       {/* Trailer Modal */}
-       {isTrailerOpen && (
-         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-75 z-50">
-         <div className="bg-gray-900 p-6 rounded-lg w-full md:w-3/4 lg:w-1/2">
-           <h2 className="text-2xl font-semibold mb-4 text-white">{movieDetails?.name} - Trailer</h2>
-           {trailerUrl ? (
-             <video width="100%" height="auto" controls>
-               <source src={trailerUrl} type="video/mp4" />
-               Your browser does not support the video tag.
-             </video>
-           ) : (
-             <p className="text-white">Trailer not available</p>
-           )}
-           <button
-             onClick={() => setIsTrailerOpen(false)}
-             className="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
-           >
-             Close
-           </button>
-         </div>
-       </div>
-     )}
+      {/* Trailer Modal */}
+      {isTrailerOpen && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-75 z-50">
+          <div className="bg-gray-900 p-6 rounded-lg w-full md:w-3/4 lg:w-1/2">
+            <h2 className="text-2xl font-semibold mb-4 text-white">{movieDetails?.name} - Trailer</h2>
+            {trailerUrl ? (
+              <video width="100%" height="auto" controls>
+                <source src={trailerUrl} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              <p className="text-white">Trailer not available</p>
+            )}
+            <button
+              onClick={() => setIsTrailerOpen(false)}
+              className="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
       <ToastContainer />
     </div>
   );

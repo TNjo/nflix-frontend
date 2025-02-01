@@ -108,6 +108,7 @@ const Home = () => {
 
       <div className="pt-24" />
 
+      {topMovies.length > 0 && (
       <Carousel
         title="IMDB Top Movies"
         movies={topMovies}
@@ -116,7 +117,9 @@ const Home = () => {
         goToPrevious={goToPreviousTopMovies}
         goToNext={goToNextTopMovies}
       />
+    )}
 
+    {recentMovies.length > 0 && (
       <Carousel
         title="Recently Added Tv Series/Tv Shows"
         movies={recentMovies}
@@ -125,7 +128,9 @@ const Home = () => {
         goToPrevious={goToPreviousRecentMovies}
         goToNext={goToNextRecentMovies}
       />
+    )}
 
+    {newlyAddedMovies.length > 0 && (
       <Carousel
         title="Newly Added Movies"
         movies={newlyAddedMovies}
@@ -134,6 +139,8 @@ const Home = () => {
         goToPrevious={goToPreviousNewlyAddedMovies}
         goToNext={goToNextNewlyAddedMovies}
       />
+    )}
+    
     </div>
   );
 };
