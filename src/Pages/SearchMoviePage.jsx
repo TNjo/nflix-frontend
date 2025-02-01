@@ -116,7 +116,7 @@ const SearchMoviePage = () => {
         </div>
       </header>
 
-      <section className="container m-auto pt-28 w-full">
+      <section className="container m-auto pt-28 px-10 w-full">
         {/* Movie List */}
         {movies.length > 0 ? (
           <div>
