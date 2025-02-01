@@ -15,6 +15,27 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true); // Loading state
   const navigate = useNavigate();
 
+  const checkLocalStorageExpiry = () => {
+    const savedTimestamp = localStorage.getItem("moviesTimestamp");
+    const currentTime = Date.now();
+
+    if (savedTimestamp && currentTime - savedTimestamp < 15 * 60 * 1000) {
+      // If last saved data is less than 15 minutes ago, return true
+      return true;
+    }
+
+    // If it's expired or not present, return false
+    return false;
+  };
+
+  const saveToLocalStorage = (topMovies, recentMovies, newlyAddedMovies) => {
+    const currentTime = Date.now();
+    localStorage.setItem("topMovies", JSON.stringify(topMovies));
+    localStorage.setItem("recentMovies", JSON.stringify(recentMovies));
+    localStorage.setItem("newlyAddedMovies", JSON.stringify(newlyAddedMovies));
+    localStorage.setItem("moviesTimestamp", currentTime); // Save current timestamp
+  };
+
   // Fetch Movies
   useEffect(() => {
     const loadMovies = () => {
@@ -22,7 +43,8 @@ const Home = () => {
       const savedRecentMovies = localStorage.getItem("recentMovies");
       const savedNewlyAddedMovies = localStorage.getItem("newlyAddedMovies");
 
-      if (savedTopMovies && savedRecentMovies && savedNewlyAddedMovies) {
+      if (checkLocalStorageExpiry() && savedTopMovies && savedRecentMovies && savedNewlyAddedMovies) {
+        // If data is valid in localStorage and hasn't expired
         setTopMovies(JSON.parse(savedTopMovies));
         setRecentMovies(JSON.parse(savedRecentMovies));
         setNewlyAddedMovies(JSON.parse(savedNewlyAddedMovies));
@@ -34,31 +56,33 @@ const Home = () => {
 
     const fetchMovies = async () => {
       try {
-        const [topRes, recentRes, newlyAddedRes] = await Promise.all([
-          fetch("http://127.0.0.1:5000/imdb/top-movies"),
+        const topRes = await fetch("http://127.0.0.1:5000/imdb/top-movies");
+        const topData = await topRes.json();
+        setTopMovies(topData.slice(0, 30));  // Set topMovies data
+
+        // Now set isLoading to false after top movies have been fetched
+        setIsLoading(false);
+
+        // Fetch other movies
+        const [recentRes, newlyAddedRes] = await Promise.all([
           fetch("http://127.0.0.1:5000/newly-added-image"),
           fetch("http://127.0.0.1:5000/newly-added-movies"),
         ]);
 
-        const [topData, recentData, newlyAddedData] = await Promise.all([
-          topRes.json(),
+        const [recentData, newlyAddedData] = await Promise.all([
           recentRes.json(),
           newlyAddedRes.json(),
         ]);
 
-        // Set topMovies data and immediately set isLoading to false
-        setTopMovies(topData.slice(0, 30)); 
-        setIsLoading(false);
         setRecentMovies(recentData);
         setNewlyAddedMovies(newlyAddedData);
 
-        // Save fetched data to localStorage
-        localStorage.setItem("topMovies", JSON.stringify(topData.slice(0, 30)));
-        localStorage.setItem("recentMovies", JSON.stringify(recentData));
-        localStorage.setItem("newlyAddedMovies", JSON.stringify(newlyAddedData));
+        // Save fetched data to localStorage and timestamp
+        saveToLocalStorage(topData.slice(0, 30), recentData, newlyAddedData);
 
       } catch (error) {
         console.error("Error fetching movies:", error);
+        setIsLoading(false); // In case of an error, stop loading
       }
     };
 
@@ -75,7 +99,7 @@ const Home = () => {
   const goToPreviousNewlyAddedMovies = () => setNewlyAddedMoviesIndex((prevIndex) => (prevIndex === 0 ? Math.floor(newlyAddedMovies.length / 5) - 1 : prevIndex - 1));
   const goToNextNewlyAddedMovies = () => setNewlyAddedMoviesIndex((prevIndex) => (prevIndex === Math.floor(newlyAddedMovies.length / 5) - 1 ? 0 : prevIndex + 1));
 
-  const goToMovieDetails = (imdbNumber) => navigate(`/movie-details/${imdbNumber}`);
+  const goToMovieDetails = (imdbNumber,infoHash, movieName) => navigate(`/movie-details/${imdbNumber}`, { state: { infoHash, movieName } });
 
   return (
     <div className="bg-gray-900 min-h-screen text-white relative pb-8">
@@ -89,7 +113,6 @@ const Home = () => {
         movies={topMovies}
         index={topMoviesIndex}
         movieDetails={goToMovieDetails}
-       // setIndex={setTopMoviesIndex}
         goToPrevious={goToPreviousTopMovies}
         goToNext={goToNextTopMovies}
       />
@@ -99,7 +122,6 @@ const Home = () => {
         movies={recentMovies}
         index={recentMoviesIndex}
         movieDetails={goToMovieDetails}
-      //  setIndex={setRecentMoviesIndex}
         goToPrevious={goToPreviousRecentMovies}
         goToNext={goToNextRecentMovies}
       />
@@ -109,7 +131,6 @@ const Home = () => {
         movies={newlyAddedMovies}
         index={newlyAddedMoviesIndex}
         movieDetails={goToMovieDetails}
-       // setIndex={setNewlyAddedMoviesIndex}
         goToPrevious={goToPreviousNewlyAddedMovies}
         goToNext={goToNextNewlyAddedMovies}
       />

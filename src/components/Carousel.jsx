@@ -58,7 +58,7 @@ const Carousel = ({
                   </h3>
                   <div className="mt-auto">
                     <button
-                      onClick={() => movieDetails(movie.imdb)}
+                      onClick={() => movieDetails(movie.imdb, movie.info_hash, movie.name)}
                       className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 mb-2 rounded-full w-full transition duration-300 shadow-md"
                     >
                       View Details

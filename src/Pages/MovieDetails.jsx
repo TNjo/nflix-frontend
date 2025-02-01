@@ -3,15 +3,15 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/Header";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import axios from "axios"; // Add this import
+import axios from "axios";
 
 const MovieDetails = () => {
   const { imdbNumber } = useParams();
-  const location = useLocation(); 
+  const location = useLocation();
   const { infoHash, movieName } = location.state || {};
   const [movieDetails, setMovieDetails] = useState(null);
   const [trailerUrl, setTrailerUrl] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTrailerOpen, setIsTrailerOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const MovieDetails = () => {
   const streamMovie = async () => {
     try {
       const response = await axios.get(`http://127.0.0.1:5000/generate-magnet/${infoHash}/${movieName}`);
-      toast.success(response.data.message); // Display success message
+      toast.success(response.data.message);
     } catch (err) {
       toast.error("Failed to generate magnet link. Please try again.");
     }
@@ -48,7 +48,7 @@ const MovieDetails = () => {
   const downloadMovie = async () => {
     try {
       const response = await axios.get(`http://127.0.0.1:5000/generate-magnet-download/${infoHash}/${movieName}`);
-      toast.success(response.data.message); // Display success message
+      toast.success(response.data.message);
     } catch (err) {
       toast.error("Failed to generate magnet link. Please try again.");
     }
@@ -59,12 +59,12 @@ const MovieDetails = () => {
   return (
     <div className="bg-gray-900 min-h-screen text-white">
       {/* Header */}
-      <Header/>
+      <Header />
 
       {/* Content Section */}
-      <section className="container mx-auto p-6 flex flex-col md:flex-row items-start gap-6 pt-28">
+      <section className="container mx-auto p-6 flex flex-col md:flex-row items-start pt-28">
         {/* Left Section: Movie Poster */}
-        <div className="w-full md:w-1/3">
+        <div className="w-full md:w-1/3 mr-8 ml-16">
           <img
             src={movieDetails?.image || "/path/to/default-image.jpg"}
             alt={movieDetails?.name}
@@ -78,7 +78,6 @@ const MovieDetails = () => {
 
           {/* Ratings and Votes */}
           <div className="flex items-center mb-8 text-lg text-gray-400">
-            
             <span className="flex items-center">
               <span className="text-lg mr-2">
                 {movieDetails?.aggregateRating?.ratingValue || "N/A"}
@@ -93,8 +92,7 @@ const MovieDetails = () => {
               </svg>
             </span>
             |
-            
-            <span className="text-sm ml-4 ">
+            <span className="text-sm ml-4">
               {movieDetails?.aggregateRating?.ratingCount || 0} Votes
             </span>
           </div>
@@ -106,45 +104,45 @@ const MovieDetails = () => {
             {renderField(movieDetails?.description)}
           </p>
 
-          {/* Action Buttons: Play and Download */}
-          <div className="flex items-center gap-4 mb-6">
-            {/* Play Button */}
-            <button
-              className="flex items-center bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-gray-200 transition"
-              onClick={streamMovie}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 16 16"
-                className="w-5 h-5 mr-1"
+          {infoHash && (
+            <div className="flex items-center gap-4 mb-6">
+              {/* Play Button */}
+              <button
+                className="flex items-center bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-gray-200 transition"
+                onClick={streamMovie}
               >
-                <path d="M11.596 8.697l-6-4A.5.5 0 0 0 5 5v6a.5.5 0 0 0 .796.404l6-4a.5.5 0 0 0 0-.808z" />
-              </svg>
-              Play
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 16 16"
+                  className="w-5 h-5 mr-1"
+                >
+                  <path d="M11.596 8.697l-6-4A.5.5 0 0 0 5 5v6a.5.5 0 0 0 .796.404l6-4a.5.5 0 0 0 0-.808z" />
+                </svg>
+                Play
+              </button>
 
-            {/* Download Button */}
-            <button
-              className="flex items-center bg-gray-700 text-white px-5 py-2 rounded-lg font-semibold hover:bg-gray-600 transition"
-              onClick={downloadMovie}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                className="w-5 h-5 mr-2"
+              {/* Download Button */}
+              <button
+                className="flex items-center bg-gray-700 text-white px-5 py-2 rounded-lg font-semibold hover:bg-gray-600 transition"
+                onClick={downloadMovie}
               >
-                <path d="M12 16l4-5h-3V4h-2v7H8l4 5z" />
-                <path d="M20 18v2H4v-2h16z" />
-              </svg>
-              Download
-            </button>
-          </div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  className="w-5 h-5 mr-2"
+                >
+                  <path d="M12 16l4-5h-3V4h-2v7H8l4 5z" />
+                  <path d="M20 18v2H4v-2h16z" />
+                </svg>
+                Download
+              </button>
+            </div>
+          )}
 
           {/* Cast, Director, and Genres */}
           <div className="mb-6 text-md">
-
             {/* Genres */}
             <div className="flex mb-4">
               <span className="w-32 text-gray-400 font-medium">Genres</span>
@@ -207,55 +205,43 @@ const MovieDetails = () => {
                 )}
               </span>
             </div>
-
-          </div>
-
-
-          {/* Trailer Button */}
-          {trailerUrl && (
+            {trailerUrl && (
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => setIsTrailerOpen(true)}
               className="bg-red-600 text-white px-4 py-2 mt-2 rounded-lg text-md font-semibold hover:bg-red-700 transition"
             >
               Watch Trailer
             </button>
           )}
-
+          </div>
         </div>
       </section>
 
-      {/* Trailer Modal */}
-      {isModalOpen && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-75 z-50">
-          <div className="bg-gray-900 p-6 rounded-lg w-full md:w-3/4 lg:w-1/2">
-            <h2 className="text-2xl font-semibold mb-4 text-white">{movieDetails?.name} - Trailer</h2>
-            {trailerUrl ? (
-              <video width="100%" height="auto" controls>
-                <source src={trailerUrl} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            ) : (
-              <p className="text-white">Trailer not available</p>
-            )}
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-       <div className="bg-gray-900 min-h-screen text-white">
-    {/* Header and other sections */}
-    
-    {/* ToastContainer should be here */}
-    <ToastContainer />
-  </div>
+       {/* Trailer Modal */}
+       {isTrailerOpen && (
+         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-75 z-50">
+         <div className="bg-gray-900 p-6 rounded-lg w-full md:w-3/4 lg:w-1/2">
+           <h2 className="text-2xl font-semibold mb-4 text-white">{movieDetails?.name} - Trailer</h2>
+           {trailerUrl ? (
+             <video width="100%" height="auto" controls>
+               <source src={trailerUrl} type="video/mp4" />
+               Your browser does not support the video tag.
+             </video>
+           ) : (
+             <p className="text-white">Trailer not available</p>
+           )}
+           <button
+             onClick={() => setIsTrailerOpen(false)}
+             className="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+           >
+             Close
+           </button>
+         </div>
+       </div>
+     )}
+      <ToastContainer />
     </div>
-    
   );
 };
 
 export default MovieDetails;
-

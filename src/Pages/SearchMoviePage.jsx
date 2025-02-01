@@ -116,11 +116,11 @@ const SearchMoviePage = () => {
         </div>
       </header>
 
-      <section className="container mx-auto pt-28 w-full">
+      <section className="container m-auto pt-28 w-full">
         {/* Movie List */}
         {movies.length > 0 ? (
           <div>
-            <table className="w-full text-lg">
+            <table className="w-full text-lg m-auto ">
               <thead>
                 <tr className="text-left bg-gray-700 text-gray-300">
                   <th className="px-4 py-2 w-1/4">Name</th> {/* Shortened the movie name column */}

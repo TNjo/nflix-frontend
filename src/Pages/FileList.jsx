@@ -50,6 +50,20 @@ const FileList = () => {
     }
   };
 
+  const handleOpenFolder = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/open-folder');
+      if (!response.ok) {
+        throw new Error('Failed to open folder');
+      }
+      const data = await response.json();
+      alert(data.message); // Show success message
+    } catch (error) {
+      alert(error.message); // Show error message if the API fails
+    }
+  };
+  
+
   return (
     <div className="bg-gray-900 min-h-screen text-white">
       <Header />
@@ -70,10 +84,10 @@ const FileList = () => {
                   </h2>
                   <p className="text-sm text-gray-400">{file.size ? file.size : 'Unknown size'}</p>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex">
                   <button
-                    className="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-white hover:text-black  transition-colors"
-                    onClick={""}
+                    className="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-white hover:text-black  transition-colors mr-4"
+                    onClick={handleOpenFolder}
                   >
                     Open
                   </button>
